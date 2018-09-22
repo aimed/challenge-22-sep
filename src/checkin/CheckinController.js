@@ -1,15 +1,18 @@
 import { Model } from "mongoose";
 import { SeatAvailability } from "../seat/SeatAvailability";
 import { CheckinReservationStatus } from "./CheckinReservationStatus";
+import { CreditCardPaymentService } from "../payments/CreditCardPaymentService";
 
 export class CheckinController {
     /**
      * Creates an instance of CheckinController.
      * @param {Model} seatModel
+     * @param {CreditCardPaymentService} creditCardPaymentService
      * @memberof CheckinController
      */
-    constructor(seatModel) {
+    constructor(seatModel, creditCardPaymentService) {
         this.seatModel = seatModel;
+        this.creditCardPaymentService = creditCardPaymentService || new CreditCardPaymentService();
     }
 
     checkinsForPassenger = (planeId, passengerId) => {
@@ -79,7 +82,10 @@ export class CheckinController {
         }
 
         const seatId = request.params.seatId;
-        const result = await this.seatModel.updateOne({ _id: seatId, assignedTo: passengerId, availability: SeatAvailability.reserved }, { availability: SeatAvailability.available, assignedTo: null }, { new: true });
+        const result = await this.seatModel.updateOne(
+            { _id: seatId, assignedTo: passengerId, availability: SeatAvailability.reserved }, 
+            { availability: SeatAvailability.available, assignedTo: null }, 
+            { new: true });
 
         if (!result) {
             throw new Error(`The seat with id ${seatId} has not been reserved for passenger ${passengerId}`);
