@@ -145,9 +145,10 @@ Response:
 ```
 
 ## Configuration
+Example config:
 ```
-MONGO_DB=
-PORT=
+MONGO_DB=mongodb://localhost/challenge-22-sep
+PORT=8002
 ```
 
 ## Running
@@ -164,3 +165,11 @@ yarn test
 ## External code used
 - babel for transpiling
 - bodyParser for express
+
+## TODOs
+### Locks for passengers as well as seats
+It is currently possible for concurrent requests to check in the same seat.
+The prevent this, a Lock model can be used. The lock simply locks all access to an object with a
+given id. Before processing the lock can be aquired and after processing the lock can be released.
+If a request tries to access an object that has been locked, one can either throw an exception
+or add the request to a queue that will be processed when the lock is released.
