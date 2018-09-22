@@ -23,7 +23,6 @@ export class CheckinController {
     }
 
     checkin = async (request, response) => {
-        // TODO: Check that no seat is assigned to that user.
         const passengerId = request.body.passengerId;
         if (!passengerId) {
             throw new Error('Requires: passengerId');

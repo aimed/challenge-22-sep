@@ -30,5 +30,5 @@ export async function createTestSeats(models) {
     ]);
 
     const [ freeSeat, expensiveSeat, takenSeat ] = seats;
-    return { plane, seats, freeSeat, expensiveSeat, takenSeat };
+    return { plane, seats, freeSeat, expensiveSeat, takenSeat, planeId: plane._id };
 }

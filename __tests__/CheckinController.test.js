@@ -124,4 +124,22 @@ describe('CheckinController', () => {
         expect(seatUpdated.assignedTo).toBeFalsy();
         expect(seatUpdated.availability).toBe(SeatAvailability.available);
     });
+
+    it('should not be able to reserve or checkin multiple seats for one user', async () => {
+        const controller = getCheckinController();
+        const passengerId = createPassengerId();
+        const { freeSeat, expensiveSeat, planeId } = await createTestSeats(container.models);
+        const expensiveSeatCheckinRequest = {
+            params: { planeId, seatId: expensiveSeat._id },
+            body: { passengerId }
+        };
+        const reserveResponse = await controller.checkin(expensiveSeatCheckinRequest);
+        expect(reserveResponse).toBeTruthy();
+
+        const freeSeatCheckinRequest = {
+            params: { planeId, seatId: freeSeat._id },
+            body: { passengerId }
+        };
+        expect(controller.checkin(freeSeatCheckinRequest)).rejects.toBeTruthy();
+    });
 });
