@@ -1,4 +1,4 @@
-import { testKit } from "./testKit";
+import { testKit } from "./utils/testKit";
 import { PlaneController } from "../src/plane/PlaneController";
 
 describe('PlaneController', () => {

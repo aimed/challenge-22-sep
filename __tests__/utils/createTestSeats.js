@@ -1,4 +1,4 @@
-import { SeatAvailability } from "../src/seat/SeatAvailability";
+import { SeatAvailability } from "../../src/seat/SeatAvailability";
 import { createPassengerId } from "./createPassengerId";
 
 export async function createTestSeats(models) {

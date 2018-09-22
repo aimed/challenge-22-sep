@@ -1,7 +1,7 @@
-import { testKit } from "./testKit";
+import { testKit } from "./utils/testKit";
 import { CheckinController } from "../src/checkin/CheckinController";
-import { createTestSeats } from "./createTestSeats";
-import { createPassengerId } from "./createPassengerId";
+import { createTestSeats } from "./utils/createTestSeats";
+import { createPassengerId } from "./utils/createPassengerId";
 import { CheckinReservationStatus } from "../src/checkin/CheckinReservationStatus";
 import { SeatAvailability } from "../src/seat/SeatAvailability";
 

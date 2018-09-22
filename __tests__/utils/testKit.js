@@ -1,6 +1,6 @@
 import uuid from 'uuid';
 import mongoose from 'mongoose';
-import { getModels } from '../src/models';
+import { getModels } from '../../src/models';
 
 export function testKit() {
     const container = {
