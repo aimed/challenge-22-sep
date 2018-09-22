@@ -139,4 +139,5 @@ yarn test
 ```
 
 ## External code used
-- Babel
+- babel for transpiling
+- bodyParser for express

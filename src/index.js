@@ -8,10 +8,13 @@ Requirements:
 - This is the minimum feature set. You can always add more features if you think they are relevant.
  */
 import '@babel/polyfill';
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
 import express from 'express';
+import bodyParser from 'body-parser';
+
 import { PlaneController } from './plane/PlaneController';
 import { getModels } from './models';
+import { CheckinController } from './checkin/CheckinController';
 
 function asyncControllerHandler(handler) {
     return function (request, response, next) {
@@ -28,11 +31,15 @@ const bootstrap = async () => new Promise(async (resolve) => {
 
     const controllers = {
         plane: new PlaneController(models.Plane, models.Seat),
+        checkIn: new CheckinController(models.Seat),
     };
 
     const app = express();
+    app.use(bodyParser.json());
+    app.get('/plane/create', asyncControllerHandler(controllers.plane.create)); // TODO: For testing purposes only.
     app.get('/plane/:planeId/seats', asyncControllerHandler(controllers.plane.seats));
-    app.get('/plane/create', asyncControllerHandler(controllers.plane.create));
+    app.post('/plane/:planeId/check-in/:seatId?', asyncControllerHandler(controllers.checkIn.checkin));
+    app.delete('/plane/:planeId/check-in/:seatId', asyncControllerHandler(controllers.checkIn.cancel));
 
     const port = process.env.PORT || 8002;
     const config = { connection, app, port, models, controllers };
