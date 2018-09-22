@@ -79,8 +79,11 @@ export class CheckinController {
         }
 
         const seatId = request.params.seatId;
-        const result = await this.seatModel.updateOne({ assignedTo: passengerId, availability: SeatAvailability.reserved }, { availability: SeatAvailability.available, assignedTo: null });
-        console.log(result);
+        const result = await this.seatModel.updateOne({ _id: seatId, assignedTo: passengerId, availability: SeatAvailability.reserved }, { availability: SeatAvailability.available, assignedTo: null }, { new: true });
+
+        if (!result) {
+            throw new Error(`The seat with id ${seatId} has not been reserved for passenger ${passengerId}`);
+        }
 
         return {
             status: 'success'

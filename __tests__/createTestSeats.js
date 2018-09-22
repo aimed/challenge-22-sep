@@ -1,4 +1,5 @@
 import { SeatAvailability } from "../src/seat/SeatAvailability";
+import { createPassengerId } from "./createPassengerId";
 
 export async function createTestSeats(models) {
     const { Plane, Seat } = models;
@@ -17,8 +18,17 @@ export async function createTestSeats(models) {
             fee: 15,
             label: '15F',
             availability: SeatAvailability.available
+        },
+        {
+            planeId: plane._id,
+            seatType: 'window',
+            fee: 15,
+            label: '15G',
+            availability: SeatAvailability.unavailable,
+            assignedTo: createPassengerId()
         }
     ]);
 
-    return { plane, seats };
+    const [ freeSeat, expensiveSeat, takenSeat ] = seats;
+    return { plane, seats, freeSeat, expensiveSeat, takenSeat };
 }
