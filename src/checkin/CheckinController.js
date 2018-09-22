@@ -19,7 +19,7 @@ export class CheckinController {
 
     checkinsForPassenger = (planeId, passengerId) => {
         return this.seatModel.findOne(
-            { planeId: planeId, assignedTo: passengerId });
+            { planeId: planeId, assignedTo: passengerId, availability: { $not: { $eq: SeatAvailability.available } } });
     }
 
     checkin = async (request, response) => {
@@ -118,7 +118,7 @@ export class CheckinController {
         
         const seatId = request.params.seatId;
         const seat = await this.seatModel.findOne(
-            { _id: seatId, assignedTo: passengerId, availability: { $not: SeatAvailability.unavailable } });
+            { _id: seatId, assignedTo: passengerId, availability: { $not: { $eq: SeatAvailability.unavailable } } });
         
         if (!seat) {
             throw new Error(`The seat ${seatId} has already been taken`);

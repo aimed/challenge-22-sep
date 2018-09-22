@@ -142,4 +142,25 @@ describe('CheckinController', () => {
         };
         expect(controller.checkin(freeSeatCheckinRequest)).rejects.toBeTruthy();
     });
+
+
+    it('should check in after a successfull payment', async () => {
+        const controller = getCheckinController();
+        const passengerId = createPassengerId();
+        const { expensiveSeat, planeId } = await createTestSeats(container.models);
+        const checkinRequest = {
+            params: { planeId, seatId: expensiveSeat._id },
+            body: { passengerId }
+        };
+        await controller.checkin(checkinRequest);
+        const payRequest = {
+            params: { planeId, seatId: expensiveSeat._id },
+            body: { passengerId, paymentMethod: 'creditCard', creditCard: {} }
+        };
+        const paymentResponse = await controller.pay(payRequest);
+        expect(paymentResponse).toBeTruthy();
+        expect(paymentResponse.seat._id.toString()).toBe(expensiveSeat._id.toString());
+        expect(paymentResponse.passengerId).toBe(passengerId);
+        expect(paymentResponse.reservation.status).toBe(CheckinReservationStatus.checkedIn);
+    });
 });
