@@ -60,7 +60,7 @@ bootstrap()
 function errorHandler(err, request, response, next) {
     const message = err.message || err.toString();
     const code = err.status || 500;
-    response.json(code, {
+    response.status(code).json({
         status: 'error',
         message: message,
         code: code
