@@ -10,14 +10,32 @@ Requirements:
 import '@babel/polyfill';
 import mongoose from 'mongoose';
 import express from 'express';
+import { PlaneController } from './plane/PlaneController';
+
+function asyncControllerHandler(handler) {
+    return function (request, response, next) {
+        handler(request, response)
+        .then(data => response.json(data))
+        .catch(error => next(error));
+    }
+}
 
 const bootstrap = async () => new Promise(async (resolve) => {
     const connectionString = process.env.MONGO_DB || 'mongodb://localhost';
     const connection = await mongoose.connect(connectionString);
     
+    const models = {
+    };
+    
+    const controllers = {
+        plane: new PlaneController(models.plane),
+    };
+
     const app = express();
+    app.get('/plane/:planeId/seats', asyncControllerHandler(controllers.plane.getSeats));
+
     const port = process.env.PORT || 8002;
-    const config = { connection, app, port };
+    const config = { connection, app, port, models, controllers };
     app.listen(port, resolve(config));
 });
 
