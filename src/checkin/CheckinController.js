@@ -23,10 +23,10 @@ export class CheckinController {
      * @memberof CheckinController
      */
     checkinsForPassenger = (planeId, passengerId) => {
-        return this.seatModel.findOne({ 
-            planeId: planeId, 
-            assignedTo: passengerId, 
-            availability: { $not: { $eq: SeatAvailability.available } } 
+        return this.seatModel.findOne({
+            planeId: planeId,
+            assignedTo: passengerId,
+            availability: { $not: { $eq: SeatAvailability.available } }
         });
     }
 
@@ -57,7 +57,8 @@ export class CheckinController {
             throw new Error('Unavaiable seat ' + seat._id);
         }
 
-        const seatResponse = {
+        // Only show public properties
+        const publicSeat = {
             _id: seat.id,
             label: seat.label,
             seatType: seat.seatType,
@@ -68,27 +69,27 @@ export class CheckinController {
         const isFreeCheckin = !seatId || fee === 0;
         const availability = isFreeCheckin ? SeatAvailability.unavailable : SeatAvailability.reserved;
         const reservedUntil = Date.now() + (3 * 60 * 1000);
-        await this.seatModel.findByIdAndUpdate(seat._id, { 
-            assignedTo: passengerId, 
-            reservedUntil, 
+        await this.seatModel.findByIdAndUpdate(seat._id, {
+            assignedTo: passengerId,
+            reservedUntil,
             availability
         });
 
         if (isFreeCheckin) {
             return {
                 passengerId,
-                seat: seatResponse,
-                reservation: { 
-                    status: CheckinReservationStatus.checkedIn 
+                seat: publicSeat,
+                reservation: {
+                    status: CheckinReservationStatus.checkedIn
                 }
             };
         }
 
         return {
             passengerId,
-            seat: seatResponse,
-            reservation: { 
-                status: CheckinReservationStatus.reserved, 
+            seat: publicSeat,
+            reservation: {
+                status: CheckinReservationStatus.reserved,
                 reservedUntil,
                 fee,
             }
@@ -108,8 +109,8 @@ export class CheckinController {
 
         const seatId = request.params.seatId;
         const result = await this.seatModel.updateOne(
-            { _id: seatId, assignedTo: passengerId, availability: SeatAvailability.reserved }, 
-            { availability: SeatAvailability.available, assignedTo: null }, 
+            { _id: seatId, assignedTo: passengerId, availability: SeatAvailability.reserved },
+            { availability: SeatAvailability.available, assignedTo: null },
             { new: true });
 
         if (!result) {
@@ -143,29 +144,30 @@ export class CheckinController {
         }
 
         const paymentService = this.paymentServices.creditCard;
-        
+
         const seatId = request.params.seatId;
-        const seat = await this.seatModel.findOne({ 
-            _id: seatId, 
-            assignedTo: passengerId, 
-            availability: { $not: { $eq: SeatAvailability.unavailable } } 
+        const seat = await this.seatModel.findOne({
+            _id: seatId,
+            assignedTo: passengerId,
+            availability: { $not: { $eq: SeatAvailability.unavailable } }
         });
-        
+
         if (!seat) {
             throw new Error(`The seat ${seatId} has already been taken`);
         }
-        
+
         const paymentWasSuccessfull = await paymentService.pay(paymentDetails);
         if (!paymentWasSuccessfull) {
             throw new Error('The payment could not be processed')
         }
 
         await this.seatModel.findByIdAndUpdate(
-            seat._id, 
+            seat._id,
             { availability: SeatAvailability.unavailable });
 
+        // Only show public properties
         const seatResponse = {
-            _id: seat.id,
+            _id: seat._id,
             label: seat.label,
             seatType: seat.seatType,
             available: false,
@@ -199,7 +201,7 @@ export class CheckinController {
      * @memberof CheckinController
      */
     getRandomAvailableSeat = async (planeId) => {
-        const randomSeat = await this.seatModel.findOne({ 
+        const randomSeat = await this.seatModel.findOne({
             planeId: planeId,
             $or: [
                 { availability: SeatAvailability.available },

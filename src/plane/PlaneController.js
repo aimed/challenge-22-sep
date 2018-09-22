@@ -44,6 +44,7 @@ export class PlaneController {
         const seats = await this.seatModel.find({ planeId: planeId });
         return {
             status: 'success',
+            // Only show public properties
             seats: seats.map(seat => ({
                 _id: seat._id,
                 seatType: seat.seatType,
