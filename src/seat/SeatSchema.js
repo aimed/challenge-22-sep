@@ -1,10 +1,5 @@
 import { Schema } from "mongoose";
-
-export const SeatAvailability = {
-    available: 'available',
-    reserved: 'reserved',
-    unavailable: 'unavailable'
-}
+import { SeatAvailability } from "./SeatAvailability";
 
 export const SeatSchema = new Schema({
     planeId: Schema.Types.ObjectId,

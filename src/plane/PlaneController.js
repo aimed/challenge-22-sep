@@ -1,5 +1,5 @@
 import { Model } from "mongoose";
-import { SeatAvailability } from "../seat/SeatSchema";
+import { SeatAvailability } from "../seat/SeatAvailability";
 
 export class PlaneController {
     /**
