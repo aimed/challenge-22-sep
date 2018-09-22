@@ -41,6 +41,15 @@ const bootstrap = async () => new Promise(async (resolve) => {
     app.post('/plane/:planeId/check-in/:seatId?', asyncControllerHandler(controllers.checkIn.checkin));
     app.delete('/plane/:planeId/check-in/:seatId', asyncControllerHandler(controllers.checkIn.cancel));
     app.post('/plane/:planeId/pay/:seatId', asyncControllerHandler(controllers.checkIn.pay));
+    app.use((err, request, response, next) => {
+        const message = err.message || err.toString();
+        const code = err.status || 500;
+        response.json(code, {
+            status: 'error',
+            message: message,
+            code: code
+        });
+    });
 
     const port = process.env.PORT || 8002;
     const config = { connection, app, port, models, controllers };
