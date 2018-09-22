@@ -21,13 +21,13 @@ RESPONSE:
     "seats": [{
         "_id": "s15A",
         "name": "15A",
-        "type": "free",
+        "seatType": "free",
         "fee": 0,
         "available": true
     },{
         "_id": "s15G",
         "name": "15G",
-        "type": "window",
+        "seatType": "window",
         "fee": 15,
         "available": true
     },...]
@@ -51,7 +51,7 @@ RESPONSE:
     "seat": {
         "_id": "s15A",
         "name": "15A",
-        "type": "free"
+        "seatType": "free"
     },
     "checkIn": {
         "status": "checkedIn"
@@ -69,7 +69,7 @@ RESPONSE:
     "seat": {
         "_id": "s15G",
         "name": "15G",
-        "type": "window"
+        "seatType": "window"
     },
     "checkIn": {
         "status": "reserved",
@@ -82,7 +82,7 @@ OR IF FREE SEAT
     "seat": {
         "_id": "s15A",
         "name": "15A",
-        "type": "free"
+        "seatType": "free"
     },
     "checkIn": {
         "status": "checkedIn"
@@ -107,7 +107,7 @@ RESPONSE:
     "seat": {
         "_id": "s15A",
         "name": "15A",
-        "type": "window"
+        "seatType": "window"
     },
     "checkIn": {
         "status": "checkedIn"
