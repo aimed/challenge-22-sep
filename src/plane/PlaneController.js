@@ -1,4 +1,5 @@
 import { Model } from "mongoose";
+import { SeatAvailability } from "../seat/SeatSchema";
 
 export class PlaneController {
     /**
@@ -20,18 +21,16 @@ export class PlaneController {
                 seatType: 'free',
                 fee: 0,
                 label: '15A',
-                reserved: null,
-                booked: null
+                availability: SeatAvailability.available
             },
             {
                 planeId: plane._id,
                 seatType: 'window',
                 fee: 15,
                 label: '15F',
-                reserved: null,
-                booked: null
+                availability: SeatAvailability.available
             }
-        ])
+        ]);
 
         return {
             success: 'true',

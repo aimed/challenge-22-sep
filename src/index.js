@@ -11,8 +11,7 @@ import '@babel/polyfill';
 import mongoose, { mongo } from 'mongoose';
 import express from 'express';
 import { PlaneController } from './plane/PlaneController';
-import { PlaneSchema } from './plane/PlaneSchema';
-import { SeatSchema } from './seat/SeatSchema';
+import { getModels } from './models';
 
 function asyncControllerHandler(handler) {
     return function (request, response, next) {
@@ -25,11 +24,7 @@ function asyncControllerHandler(handler) {
 const bootstrap = async () => new Promise(async (resolve) => {
     const connectionString = process.env.MONGO_DB || 'mongodb://localhost';
     const connection = await mongoose.connect(connectionString);
-    
-    const models = {
-        Plane: mongoose.model('Plane', PlaneSchema),
-        Seat: mongoose.model('Seat', SeatSchema),
-    };
+    const models = getModels(connection);
 
     const controllers = {
         plane: new PlaneController(models.Plane, models.Seat),

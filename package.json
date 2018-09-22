@@ -22,7 +22,8 @@
     "babel-core": "^7.0.0-bridge",
     "babel-jest": "^23.6.0",
     "jest": "^23.6.0",
-    "nodemon": "^1.18.4"
+    "nodemon": "^1.18.4",
+    "uuid": "^3.3.2"
   },
   "scripts": {
     "build": "babel src -d build",
