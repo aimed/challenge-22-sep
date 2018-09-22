@@ -1,38 +1,51 @@
+import { Model } from "mongoose";
+
 export class PlaneController {
-    constructor(planeModel) {
+    /**
+     * Creates an instance of PlaneController.
+     * @param {Model} planeModel
+     * @param {Model} seatModel
+     * @memberof PlaneController
+     */
+    constructor(planeModel, seatModel) {
         this.planeModel = planeModel;
+        this.seatModel = seatModel;
     }
 
     create = async (request, response) => {
-        const plane = await this.planeModel.create({
-            seats: [
-                {
-                    seatType: 'free',
-                    fee: 0,
-                    label: '15A',
-                    reserved: null,
-                    booked: null
-                }
-            ]
-        });
+        const plane = await this.planeModel.create({});
+        const seats = await this.seatModel.create([
+            {
+                planeId: plane._id,
+                seatType: 'free',
+                fee: 0,
+                label: '15A',
+                reserved: null,
+                booked: null
+            },
+            {
+                planeId: plane._id,
+                seatType: 'window',
+                fee: 15,
+                label: '15F',
+                reserved: null,
+                booked: null
+            }
+        ])
 
         return {
             success: 'true',
-            plane: plane
+            plane: plane,
+            seats: seats
         };
     }
 
     seats = async (request, response) => {
         const planeId = request.params.planeId;
-        const plane = await this.planeModel.findById(planeId);
-
-        if (!plane) {
-            throw new Error('Unknown planeId ' + planeId);
-        }
-
+        const seats = await this.seatModel.find({ planeId: planeId });
         return {
             status: 'success',
-            seats: plane.seats.map(seat => ({
+            seats: seats.map(seat => ({
                 _id: seat._id,
                 seatType: seat.seatType,
                 label: seat.label,

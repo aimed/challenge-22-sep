@@ -8,10 +8,11 @@ Requirements:
 - This is the minimum feature set. You can always add more features if you think they are relevant.
  */
 import '@babel/polyfill';
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
 import express from 'express';
 import { PlaneController } from './plane/PlaneController';
 import { PlaneSchema } from './plane/PlaneSchema';
+import { SeatSchema } from './seat/SeatSchema';
 
 function asyncControllerHandler(handler) {
     return function (request, response, next) {
@@ -26,11 +27,12 @@ const bootstrap = async () => new Promise(async (resolve) => {
     const connection = await mongoose.connect(connectionString);
     
     const models = {
-        Plane: mongoose.model('Plane', PlaneSchema)
+        Plane: mongoose.model('Plane', PlaneSchema),
+        Seat: mongoose.model('Seat', SeatSchema),
     };
 
     const controllers = {
-        plane: new PlaneController(models.Plane),
+        plane: new PlaneController(models.Plane, models.Seat),
     };
 
     const app = express();
