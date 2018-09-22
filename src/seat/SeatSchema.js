@@ -8,7 +8,7 @@ export const SeatSchema = new Schema({
     fee: Number,
     reservedUntil: Number,
     availability: String,
-    assigedTo: String // A unique passenger identifier, such as email
+    assignedTo: String // A unique passenger identifier, such as email
 });
 
 SeatSchema

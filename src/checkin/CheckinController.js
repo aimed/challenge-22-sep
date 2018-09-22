@@ -13,7 +13,7 @@ export class CheckinController {
     }
 
     checkinsForPassenger = (planeId, passengerId) => {
-        return this.seatModel.findOne({ planeId: planeId, assigedTo: passengerId }).exec();
+        return this.seatModel.findOne({ planeId: planeId, assignedTo: passengerId });
     }
 
     checkin = async (request, response) => {
@@ -51,7 +51,11 @@ export class CheckinController {
         const isFreeCheckin = !seatId || fee === 0;
         const availability = isFreeCheckin ? SeatAvailability.unavailable : SeatAvailability.reserved;
         const reservedUntil = Date.now() + (3 * 60 * 1000);
-        await this.seatModel.findByIdAndUpdate(seatId, { assigedTo: passengerId, reservedUntil: reservedUntil, availability: availability }).exec();
+        await this.seatModel.findByIdAndUpdate(seat._id, { 
+            assignedTo: passengerId, 
+            reservedUntil, 
+            availability
+        });
 
         if (isFreeCheckin) {
             return {
@@ -75,7 +79,7 @@ export class CheckinController {
         }
 
         const seatId = request.params.seatId;
-        const result = await this.seatModel.updateOne({ assigedTo: passengerId, availability: SeatAvailability.reserved }, { availability: SeatAvailability.available, assigedTo: null }).exec();
+        const result = await this.seatModel.updateOne({ assignedTo: passengerId, availability: SeatAvailability.reserved }, { availability: SeatAvailability.available, assignedTo: null });
         console.log(result);
 
         return {
