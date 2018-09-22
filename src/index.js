@@ -1,7 +1,7 @@
 /*
 Requirements:
 - The check-in application lists seats in the plane that passengers can choose
-- Different seats should have different fees (free, window, aisle, more leg-room, etc.
+- Different seats should have different fees (free, window, aisle, more leg-room, etc.)
 - A passenger can skip choosing a seat and check-in for free
 - A passenger can pick a seat and check-in for a fixed price
 - A passenger can only check-in to one seat (unless they cancel the check-in) The seat is reserved for 3 minutes for the passenger until they pay
@@ -25,7 +25,7 @@ function asyncControllerHandler(handler) {
 }
 
 const bootstrap = async () => new Promise(async (resolve) => {
-    const connectionString = process.env.MONGO_DB || 'mongodb://localhost';
+    const connectionString = process.env.MONGO_DB || 'mongodb://localhost/challenge-sep-22';
     const connection = await mongoose.connect(connectionString);
     const models = getModels(connection);
 
@@ -36,11 +36,11 @@ const bootstrap = async () => new Promise(async (resolve) => {
 
     const app = express();
     app.use(bodyParser.json());
-    app.get('/plane/create', asyncControllerHandler(controllers.plane.create)); // TODO: For testing purposes only.
+    app.post('/plane', asyncControllerHandler(controllers.plane.create)); // TODO: For testing purposes only.
     app.get('/plane/:planeId/seats', asyncControllerHandler(controllers.plane.seats));
     app.post('/plane/:planeId/check-in/:seatId?', asyncControllerHandler(controllers.checkIn.checkin));
     app.delete('/plane/:planeId/check-in/:seatId', asyncControllerHandler(controllers.checkIn.cancel));
-    app.post('/plane/:planeId/pay/:seatId?', asyncControllerHandler(controllers.checkIn.pay));
+    app.post('/plane/:planeId/pay/:seatId', asyncControllerHandler(controllers.checkIn.pay));
 
     const port = process.env.PORT || 8002;
     const config = { connection, app, port, models, controllers };

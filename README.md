@@ -11,114 +11,137 @@ Requirements:
 - This is the minimum feature set. You can always add more features if you think they are relevant.
 
 ## Booking flow
-The flow is based on the requirements.
-To book a seat we first need to know all available seats for the given plane.
+
+### Summary
 ```
-GET /plane/:planeId/seats
-RESPONSE:
-{
-    "status": "success",
-    "seats": [{
-        "_id": "s15A",
-        "name": "15A",
-        "seatType": "free",
-        "fee": 0,
-        "available": true
-    },{
-        "_id": "s15G",
-        "name": "15G",
-        "seatType": "window",
-        "fee": 15,
-        "available": true
-    },...]
-}
+POST /plane # Create a test plane with seats
+GET /plane/:planeId/seats # Query seats for the given plane
+POST /plane/:planeId/check-in/:seatId?  # Check in to a seat. No seatId will result in a random seat. If the seat was not free, a payment has to be made
+POST /plane/:planeId/pay/:seatId # Pay for the given seat reservation.
+DELETE /plane/:planeId/check-in/:seatId # Chancel the reservation
 ```
 
-There are two possible check in flows. The FREE and the PAID flow.
-The FREE flow allows the user to check in - a random seat will then be assigned or to choose a free seat.
-The PAID flow allows the user to reserve a specific non-free seat. The seat is then reserved for three minutes.
-Within the PAID flow the user must make a payment using a payment method, after wich a seet is assigned.
-
+### Creating a test plane with seats
 ```
-// CHECKIN FREE
-POST /check-in/
-REQUEST: 
+POST /plane
+```
+Request: 
+```json
+{}
+```
+Response: 
+```json
 {
-    "passengerId": "p1"
-}
-RESPONSE:
-{
-    "seat": {
-        "_id": "s15A",
-        "name": "15A",
-        "seatType": "free"
+    "success": "true",
+    "plane": {
+        "_id": "5ba645825d4ddfbe1a927ae4",
+        "__v": 0
     },
-    "checkIn": {
+    "seats": [
+        {
+            "_id": "5ba645825d4ddfbe1a927ae5",
+            "planeId": "5ba645825d4ddfbe1a927ae4",
+            "seatType": "free",
+            "fee": 0,
+            "label": "15A",
+            "availability": "available",
+        },
+        {
+            "_id": "5ba645825d4ddfbe1a927ae6",
+            "planeId": "5ba645825d4ddfbe1a927ae4",
+            "seatType": "window",
+            "fee": 15,
+            "label": "15F",
+            "availability": "available",
+        }
+    ]
+}
+```
+
+### Perform a check in on a free seat
+
+If not ```seatId``` is given a random seat will be selected.
+
+```POST /plane/:planeId/check-in/:seatId?```
+
+Request: 
+```json
+{ "passengerId": "test" }
+```
+
+Response (free):
+```json
+{
+    "passengerId": "test",
+    "seat": {
+        "_id": "5ba645825d4ddfbe1a927ae5",
+        "label": "15A",
+        "seatType": "free",
+        "available": false
+    },
+    "reservation": {
         "status": "checkedIn"
     }
 }
+```
 
-// CHECKIN PAID
-POST /check-in/:seatId
-REQUEST: 
+Response (paid):
+```json
 {
-    "passengerId": "p1"
-}
-RESPONSE:
-{
+    "passengerId": "test",
     "seat": {
-        "_id": "s15G",
-        "name": "15G",
-        "seatType": "window"
+        "_id": "5ba645825d4ddfbe1a927ae6",
+        "label": "15F",
+        "seatType": "window",
+        "available": false
     },
-    "checkIn": {
+    "reservation": {
         "status": "reserved",
-        "reservedUntil": 15000000,
+        "reservedUntil": 1537623867708,
         "fee": 15
     }
 }
-OR IF FREE SEAT
+```
+
+### Paying for reservations
+```POST /plane/:planeId/pay/:seatId```
+
+Request:
+```json
+{ 
+    "passengerId": "test",
+    "paymentMethod": "creditCard",
+    "creditCard": {} 
+}
+```
+
+Response:
+```json
 {
+    "passengerId": "test",
     "seat": {
-        "_id": "s15A",
-        "name": "15A",
-        "seatType": "free"
+        "_id": "5ba645825d4ddfbe1a927ae6",
+        "label": "15F",
+        "seatType": "window",
+        "available": false
     },
-    "checkIn": {
+    "reservation": {
         "status": "checkedIn"
     }
 }
+```
 
-// PAY
-POST /check-in/:seatId/pay/
-REQUEST: 
-{
-    "passengerId": "p1",
-    "method": "creditCard",
-    "creditCard": {
-        "number": "123-123-123",
-        "owner": "John Doe",
-        "validUntil": "15/12/2000",
-        "CCV": 419
-    }
-}
-RESPONSE:
-{
-    "seat": {
-        "_id": "s15A",
-        "name": "15A",
-        "seatType": "window"
-    },
-    "checkIn": {
-        "status": "checkedIn"
-    }
-}
+### Cancelling a reservation for a paid seat
+``` DELETE /plane/:planeId/check-in/:seatId```
 
-// Cancel
-DELETE /check-in/:seatId/pay/
-{
-    "passengerId": "p1"
-}
+Request: 
+```json
+{ "passengerId": "test" }
+```
+
+Response:
+```json
+{ "status": "success" }
 ```
 
 ## Configuration

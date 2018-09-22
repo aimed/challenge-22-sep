@@ -11,19 +11,6 @@ describe('CheckinController', () => {
     beforeAll(setup);
     afterAll(teardown);
     const getCheckinController = () => new CheckinController(container.models.Seat);
-    
-    // it('should update test', async () => {
-    //     const controller = getCheckinController();
-    //     const model = controller.seatModel;
-    //     const { seats } = await createTestSeats(container.models);
-    //     const seat = seats[0];
-    //     expect(seat.availability === SeatAvailability.available);
-
-    //     await model.findByIdAndUpdate(seat._id, { availability: SeatAvailability.reserved });
-
-    //     const newSeat = await model.findById(seat._id);
-    //     expect(newSeat.availability).toBe(SeatAvailability.reserved);
-    // });
 
     it('should perform a checkin with no seatId', async () => {
         const controller = getCheckinController();
