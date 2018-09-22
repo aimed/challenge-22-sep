@@ -17,11 +17,24 @@ export class CheckinController {
         };
     }
 
+    /**
+     * Gets the checkin for the passenger if applicable.
+     *
+     * @memberof CheckinController
+     */
     checkinsForPassenger = (planeId, passengerId) => {
-        return this.seatModel.findOne(
-            { planeId: planeId, assignedTo: passengerId, availability: { $not: { $eq: SeatAvailability.available } } });
+        return this.seatModel.findOne({ 
+            planeId: planeId, 
+            assignedTo: passengerId, 
+            availability: { $not: { $eq: SeatAvailability.available } } 
+        });
     }
 
+    /**
+     * Checks in the passenger.
+     *
+     * @memberof CheckinController
+     */
     checkin = async (request, response) => {
         const passengerId = request.body.passengerId;
         if (!passengerId) {
@@ -51,7 +64,6 @@ export class CheckinController {
             available: false,
         };
 
-        // TODO: Update when checking?
         const fee = seat.fee;
         const isFreeCheckin = !seatId || fee === 0;
         const availability = isFreeCheckin ? SeatAvailability.unavailable : SeatAvailability.reserved;
@@ -66,17 +78,28 @@ export class CheckinController {
             return {
                 passengerId,
                 seat: seatResponse,
-                reservation: { status: CheckinReservationStatus.checkedIn }
+                reservation: { 
+                    status: CheckinReservationStatus.checkedIn 
+                }
             };
         }
 
         return {
             passengerId,
             seat: seatResponse,
-            reservation: { status: CheckinReservationStatus.reserved, reservedUntil: reservedUntil, fee: fee }
+            reservation: { 
+                status: CheckinReservationStatus.reserved, 
+                reservedUntil,
+                fee,
+            }
         };
     }
 
+    /**
+     * Cancel the reservation for a seat.
+     *
+     * @memberof CheckinController
+     */
     cancel = async (request, response) => {
         const passengerId = request.body.passengerId;
         if (!passengerId) {
@@ -98,6 +121,11 @@ export class CheckinController {
         };
     }
 
+    /**
+     * Pay for the checkin.
+     *
+     * @memberof CheckinController
+     */
     pay = async (request, response) => {
         const passengerId = request.body.passengerId;
         if (!passengerId) {
@@ -117,8 +145,11 @@ export class CheckinController {
         const paymentService = this.paymentServices.creditCard;
         
         const seatId = request.params.seatId;
-        const seat = await this.seatModel.findOne(
-            { _id: seatId, assignedTo: passengerId, availability: { $not: { $eq: SeatAvailability.unavailable } } });
+        const seat = await this.seatModel.findOne({ 
+            _id: seatId, 
+            assignedTo: passengerId, 
+            availability: { $not: { $eq: SeatAvailability.unavailable } } 
+        });
         
         if (!seat) {
             throw new Error(`The seat ${seatId} has already been taken`);
@@ -129,7 +160,8 @@ export class CheckinController {
             throw new Error('The payment could not be processed')
         }
 
-        await this.seatModel.findByIdAndUpdate(seat._id, 
+        await this.seatModel.findByIdAndUpdate(
+            seat._id, 
             { availability: SeatAvailability.unavailable });
 
         const seatResponse = {
@@ -146,6 +178,11 @@ export class CheckinController {
         };
     }
 
+    /**
+     * Get a seat with the given id ensuring that it exists.
+     *
+     * @memberof CheckinController
+     */
     getSeat = async (seatId) => {
         const seat = this.seatModel.findById(seatId);
 
@@ -156,6 +193,11 @@ export class CheckinController {
         return seat;
     }
 
+    /**
+     * Get a random available seat for the given plane.
+     *
+     * @memberof CheckinController
+     */
     getRandomAvailableSeat = async (planeId) => {
         const randomSeat = await this.seatModel.findOne({ 
             planeId: planeId,
