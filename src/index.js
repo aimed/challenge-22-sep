@@ -39,6 +39,7 @@ const bootstrap = async () => new Promise(async (resolve) => {
     app.get('/plane/create', asyncControllerHandler(controllers.plane.create)); // TODO: For testing purposes only.
     app.get('/plane/:planeId/seats', asyncControllerHandler(controllers.plane.seats));
     app.post('/plane/:planeId/check-in/:seatId?', asyncControllerHandler(controllers.checkIn.checkin));
+    app.post('/plane/:planeId/pay/:seatId?', asyncControllerHandler(controllers.checkIn.pay));
     app.delete('/plane/:planeId/check-in/:seatId', asyncControllerHandler(controllers.checkIn.cancel));
 
     const port = process.env.PORT || 8002;

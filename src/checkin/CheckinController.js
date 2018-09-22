@@ -12,11 +12,14 @@ export class CheckinController {
      */
     constructor(seatModel, creditCardPaymentService) {
         this.seatModel = seatModel;
-        this.creditCardPaymentService = creditCardPaymentService || new CreditCardPaymentService();
+        this.paymentServices = {
+            creditCard: creditCardPaymentService || new CreditCardPaymentService()
+        };
     }
 
     checkinsForPassenger = (planeId, passengerId) => {
-        return this.seatModel.findOne({ planeId: planeId, assignedTo: passengerId });
+        return this.seatModel.findOne(
+            { planeId: planeId, assignedTo: passengerId });
     }
 
     checkin = async (request, response) => {
@@ -93,6 +96,54 @@ export class CheckinController {
 
         return {
             status: 'success'
+        };
+    }
+
+    pay = async (request, response) => {
+        const passengerId = request.body.passengerId;
+        if (!passengerId) {
+            throw new Error('Requires: passengerId');
+        }
+
+        const paymentMethod = request.body.paymentMethod;
+        if (!paymentMethod || paymentMethod !== 'creditCard') {
+            throw new Error('Invalid payment method. Expected creditCard but received ' + paymentMethod);
+        }
+
+        const paymentDetails = request.body[paymentMethod];
+        if (!paymentDetails) {
+            throw new Error(`Invalid data for payment method ${paymentMethod}`);
+        }
+
+        const paymentService = this.paymentServices.creditCard;
+        
+        const seatId = request.params.seatId;
+        const seat = await this.seatModel.findOne(
+            { _id: seatId, assignedTo: passengerId, availability: { $not: SeatAvailability.unavailable } });
+        
+        if (!seat) {
+            throw new Error(`The seat ${seatId} has already been taken`);
+        }
+        
+        const paymentWasSuccessfull = await paymentService.pay(paymentDetails);
+        if (!paymentWasSuccessfull) {
+            throw new Error('The payment could not be processed')
+        }
+
+        await this.seatModel.findByIdAndUpdate(seat._id, 
+            { availability: SeatAvailability.unavailable });
+
+        const seatResponse = {
+            _id: seat.id,
+            label: seat.label,
+            seatType: seat.seatType,
+            available: false,
+        };
+
+        return {
+            passengerId,
+            seat: seatResponse,
+            reservation: { status: CheckinReservationStatus.checkedIn }
         };
     }
 

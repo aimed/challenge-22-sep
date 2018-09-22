@@ -10,7 +10,7 @@ export class CreditCardPaymentService {
 
     pay(params) {
         return new Promise((resolve, reject) => {
-            setTimeout(() => resolve(), 100)
+            setTimeout(() => resolve(true), 100)
         })
     }
 }
